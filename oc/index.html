@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .tab-container {
+        display: flex;
+        margin-bottom: 10px;
+      }
+      .tab {
+        padding: 2px 20px;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        background-color: #f1f1f1;
+        flex: 1;
+        text-align: center;
+        color: #000; /* Default font color */
+      }
+      .tab.active {
+        background-color: #007bff; /* Blue background for active tab */
+        color: #fff; /* White font color for active tab */
+      }
+      #sheetEmbed {
+        width: 100%;
+        height: 100vh; /* 100% of the viewport height */
+        border: none;
+      }
+    </style>
+    <script>
+      var sheets = [
+        {name: 'NIFTY', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRnHi7B_7JCpujhS3i_Je4Tv6bHscE3ogNGn4lx8sz7-zW0FMcGDe5_lEtqIwcoK6IY3Mfe9wwy7PZo/pubhtml?gid=459184988&single=true'},
+        {name: 'BANKNIFTY', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS1DS2sOkM2sDKN_CAOa2XAZnP8xenvsBgrZDlD1MT-Z2OnwJrpqSe1ThUuH6lXqGQGYNKn9LWuWpE1/pubhtml?gid=459184988&single=true'},
+        {name: 'FINNIFTY', url: 'YOUR_SHEET3_ID'},
+        {name: 'MIDCPNIFTY', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSLQRPXmgOoyniHgV5i5W5EYK64a-B0XDIX97sarIYOxbh3moBGqLsA8jD-0bEpbL_wB4rE1d8Dg3ny/pubhtml?gid=459184988&single=true'},
+        {name: 'SENSEX', url: 'YOUR_SHEET5_ID'},
+        {name: 'BANKEX', url: 'YOUR_SHEET6_ID'}
+      ];
+      var refreshInterval;
+
+      function populateTabs() {
+        var tabContainer = document.getElementById('tabContainer');
+        sheets.forEach(function(sheet, index) {
+          var tab = document.createElement('div');
+          tab.className = 'tab';
+          tab.textContent = sheet.name;
+          tab.onclick = function() { selectTab(index); };
+          tabContainer.appendChild(tab);
+        });
+        selectTab(0); // Select the first tab by default
+        // startRefreshInterval(); // Start the refresh interval
+      }
+
+      function selectTab(index) {
+        var tabs = document.getElementsByClassName('tab');
+        for (var i = 0; i < tabs.length; i++) {
+          tabs[i].classList.remove('active');
+        }
+        tabs[index].classList.add('active');
+        document.getElementById('sheetEmbed').src = sheets[index].url;
+      }
+
+      function startRefreshInterval() {
+        clearInterval(refreshInterval); // Clear any existing interval
+        refreshInterval = setInterval(function() {
+          var iframe = document.getElementById('sheetEmbed');
+          iframe.src = iframe.src; // Reload the iframe
+        }, 60000); // Refresh every 60,000 milliseconds (1 minute)
+      }
+    </script>
+  </head>
+  <body onload="populateTabs()">
+    <div id="tabContainer" class="tab-container"></div>
+    <iframe id="sheetEmbed" src="" width="100%" height="100vh" frameborder="0"></iframe>
+  </body>
+</html>
