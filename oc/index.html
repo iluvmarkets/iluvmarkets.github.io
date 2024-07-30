@@ -51,7 +51,21 @@
           tab.onclick = function() { selectTab(index); };
           tabContainer.appendChild(tab);
         });
-        selectTab(0); // Select the first tab by default
+
+        // Check for query parameter and select the corresponding tab
+        var urlParams = new URLSearchParams(window.location.search);
+        var sheetName = urlParams.get('sheet');
+        if (sheetName) {
+          var sheetIndex = sheets.findIndex(sheet => sheet.name === sheetName);
+          if (sheetIndex !== -1) {
+            selectTab(sheetIndex);
+          } else {
+            selectTab(0); // Select the first tab by default if no valid query parameter
+          }
+        } else {
+          selectTab(0); // Select the first tab by default if no query parameter
+        }
+
         // startRefreshInterval(); // Start the refresh interval
       }
 
@@ -62,6 +76,11 @@
         }
         tabs[index].classList.add('active');
         document.getElementById('sheetEmbed').src = sheets[index].url;
+
+        // Update the URL with the selected sheet name
+        var newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('sheet', sheets[index].name);
+        window.history.replaceState({}, '', newUrl);
       }
 
       function startRefreshInterval() {
