@@ -81,21 +81,7 @@
         var newUrl = new URL(window.location.href);
         newUrl.searchParams.set('sheet', sheets[index].name);
         window.history.replaceState({}, '', newUrl);
-
-        // Remove the footer after the iframe loads
-        document.getElementById('sheetEmbed').onload = function() {
-          removeIframeFooter();
-        };        
       }
-
-      function removeIframeFooter() {
-        var iframe = document.getElementById('sheetEmbed');
-        var iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-        var footer = iframeDocument.getElementById('footer');
-        if (footer) {
-          footer.remove();
-        }
-      }      
 
       function startRefreshInterval() {
         clearInterval(refreshInterval); // Clear any existing interval
