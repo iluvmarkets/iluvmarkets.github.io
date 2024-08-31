@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Stock Charts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 20px;
+        }
+        #chart-container {
+            display: grid;
+            gap: 20px;
+            height: 600px; /* Controlled height */
+        }
+        .widget {
+            width: 100%;
+            height: 100%; 
+        }
+        label {
+            font-weight: bold;
+            color: #fff;
+        }
+        input {
+            margin: 10px 0;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 5px;
+        }
+        button {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Stock Chart Viewer</h1>
+
+    <label for="symbols">Enter Stock Symbols (comma-separated):</label><br>
+    <input type="text" id="symbols" placeholder="e.g., NASDAQ:AAPL,NASDAQ:MSFT" value="BSE:HDFCBANK, BSE:RELIANCE, BSE:ICICIBANK, BSE:KOTAKBANK, BSE:ITC, BSE:TCS" style="width: 80%;"><br>
+
+    <label for="columns">Number of Columns:</label><br>
+    <input type="number" id="columns" placeholder="Number of columns" value="4" min="1" style="width: 15%;"><br>
+
+    <button onclick="loadCharts()">Load Charts</button>
+
+    <div id="chart-container"></div>
+
+    <script>
+        function loadCharts() {
+            const container = document.getElementById('chart-container');
+            container.innerHTML = ''; // Clear existing charts
+
+            const symbols = document.getElementById('symbols').value.split(',').map(s => s.trim());
+            const columns = document.getElementById('columns').value || 4;
+
+            container.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+
+            symbols.forEach(symbol => {
+                const widgetContainer = document.createElement('div');
+                widgetContainer.className = 'tradingview-widget-container';
+                widgetContainer.style = 'height: 100%; width: 100%;';
+
+                const widgetInnerContainer = document.createElement('div');
+                widgetInnerContainer.className = 'tradingview-widget-container__widget';
+                widgetInnerContainer.style = 'height: calc(100% - 32px); width: 100%;';
+
+                widgetInnerContainer.innerHTML = `
+                    <iframe 
+                    src="https://in.tradingview.com/widgetembed/?frameElementId=tradingview-widget&symbol=${symbol}&interval=D&theme=dark" 
+                    width="100%" 
+                    height="100%" 
+                    frameborder="0" 
+                    allowtransparency="false"
+                    style=solid
+                    scrolling="no">
+                    </iframe>
+                `
+                widgetContainer.appendChild(widgetInnerContainer);
+                container.appendChild(widgetContainer);
+            });
+        }
+
+        // Load default charts on page load
+        window.onload = loadCharts;
+    </script>
+
+</body>
+</html>

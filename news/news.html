@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Announcements</title>
+    <script>
+        let bseWindow, nseWindow;
+
+        function openWindows() {
+            bseWindow = window.open("https://www.bseindia.com/corporates/ann.html", "BSE", "width=800,height=600,top=100,left=100");
+            nseWindow = window.open("https://www.nseindia.com/companies-listing/corporate-filings-announcements", "NSE", "width=800,height=600,top=100,left=920");
+
+            setTimeout(refreshWindows, 30000);
+        }
+
+        function refreshWindows() {
+            if (bseWindow) {
+                bseWindow.location.href = "https://www.bseindia.com/corporates/ann.html";
+            }
+            if (nseWindow) {
+                nseWindow.location.href = "https://www.nseindia.com/companies-listing/corporate-filings-announcements";
+            }
+
+            // Re-trigger refresh every 30 seconds
+            setTimeout(refreshWindows, 30000);
+        }
+    </script>
+</head>
+<body onload="openWindows()">
+    <h1>Corporate Announcements</h1>
+    <p>The windows will open side by side and refresh every 30 seconds.</p>
+</body>
+</html>
