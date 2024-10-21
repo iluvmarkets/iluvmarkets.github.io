@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fetch URL Contents</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    #content {
+      margin-top: 20px;
+      white-space: pre-wrap;
+      background: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Fetch Contents of a URL</h1>
+  <form id="urlForm">
+    <label for="urlInput">Enter URL:</label>
+    <input type="text" id="urlInput" placeholder="https://www.nseindia.com/api/option-chain-indices?symbol=NIFTY" required>
+    <button type="submit">Fetch</button>
+  </form>
+
+  <div id="content">Content will appear here...</div>
+
+  <script>
+    document.getElementById('urlForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const url = document.getElementById('urlInput').value;
+
+      // Clear the content area
+      const contentDiv = document.getElementById('content');
+      contentDiv.textContent = 'Loading...';
+
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.text(); // Parse the response as text
+        })
+        .then(data => {
+          contentDiv.textContent = data;
+        })
+        .catch(error => {
+          contentDiv.textContent = 'Error: ' + error.message;
+        });
+    });
+  </script>
+
+</body>
+</html>
