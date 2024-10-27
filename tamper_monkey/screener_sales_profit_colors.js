@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Screener.in Conditional Formatting with QoQ and YoY Growth
 // @namespace    http://tampermonkey.net/
-// @version      3.0
+// @version      3.1
 // @description  Apply gradient colors to specified rows and add QoQ% and YoY% Growth rows on Screener.in, after page load
 // @match        https://www.screener.in/company/*
 // @grant        none
@@ -82,7 +82,6 @@
 
         cells.forEach((cell, index) => {
             const value = values[index];
-            console.log(value);
             if (Number.isFinite(value)) {
                 if (value > 0) {
                     // Positive values - apply green gradient
@@ -97,25 +96,64 @@
         });
     }
 
-    // Function to apply color based on growth values
-    function applyColoring(cell, value) {
-        if (value > 0) {
-            // Positive growth - strong green background
-            let greenIntensity = Math.floor(200 - (value / 100) * 150);
-            cell.style.backgroundColor = `rgb(0, ${greenIntensity}, 0, 0.7)`; // Strong green
-            cell.style.color = 'white'; // Text color for better readability
-        } else if (value < 0) {
-            // Negative growth - strong red background
-            let redIntensity = Math.min(255, Math.abs(Math.floor(200 + (value / 100) * 200)));
-            cell.style.backgroundColor = `rgba(${redIntensity}, 0, 0, 0.7)`; // Strong red
-            cell.style.color = 'white'; // Text color for better readability
+    function calculatePercentageFromHigh() {
+        // Define the container with class .company-ratios to scope the search
+        const container = document.querySelector("div.company-ratios");
+
+        if (!container) {
+            console.error("Container not found");
+            return;
+        }
+
+        let currentPrice = null;
+        let highValue = null;
+        let currentPriceItem = null;
+
+        // Select all <li> elements within the container
+        const listItems = container.querySelectorAll("li");
+
+        // Loop through the <li> elements to find "Current Price" and "High / Low"
+        listItems.forEach(item => {
+            const nameElement = item.querySelector(".name");
+
+            if (nameElement && nameElement.textContent.trim() === "Current Price") {
+                // Extract the current price value
+                currentPrice = parseFloat(item.querySelector(".number").textContent.replace(/[^0-9.-]/g, ""));
+                currentPriceItem = item;  // Store the current price item to insert the new item after it
+            }
+
+            if (nameElement && nameElement.textContent.trim() === "High / Low") {
+                // Extract the high value from the "High / Low" <li>
+                highValue = parseFloat(item.querySelectorAll(".number")[0].textContent.replace(/[^0-9.-]/g, ""));
+            }
+        });
+
+        if (currentPrice !== null && highValue !== null && currentPriceItem) {
+            // Calculate the percentage from high
+            const percentFromHigh = ((currentPrice - highValue) / highValue) * 100;
+
+            // Create a new <li> element to display the result
+            const newListItem = document.createElement("li");
+            newListItem.className = "flex flex-space-between";
+            newListItem.innerHTML = `
+            <span class="name">% from High</span>
+            <span class="nowrap value"><span class="number">${percentFromHigh.toFixed(2)}%</span></span>
+        `;
+
+            // Insert the new <li> element right after the "Current Price" item
+            currentPriceItem.insertAdjacentElement('afterend', newListItem);
         } else {
-            // Zero growth - no background color
-            cell.style.backgroundColor = '';
+            console.error("Current Price or High Value not found in the HTML");
         }
     }
+
+
 
     applyConditionalFormatting("Revenue", true, true);
     applyConditionalFormatting("Sales", true, true);
     applyConditionalFormatting("Net Profit", true, true);
+
+    //Calculate distance from HIGH
+    calculatePercentageFromHigh();
+
 })();
