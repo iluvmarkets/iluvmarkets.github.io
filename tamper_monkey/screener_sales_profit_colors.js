@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Screener.in Conditional Formatting with QoQ and YoY Growth
 // @namespace    http://tampermonkey.net/
-// @version      2.8
+// @version      2.9
 // @description  Apply gradient colors to specified rows and add QoQ% and YoY% Growth rows on Screener.in, after page load
 // @match        https://www.screener.in/company/*
 // @grant        none
@@ -74,16 +74,16 @@
             yoyRow.appendChild(yoyTitleCell);
 
             // Create empty cells for alignment in the first three columns
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 4; i++) {
                 const emptyCell = document.createElement('td');
                 yoyRow.appendChild(emptyCell);
             }
 
             const yoyGrowthValues = [];
 
-            for (let i = 3; i < values.length; i++) {
+            for (let i = 4; i < values.length; i++) {
                 const growthCell = document.createElement('td');
-                const yoyGrowthValue = ((values[i] - values[i - 3]) / values[i - 3]) * 100;
+                const yoyGrowthValue = ((values[i] - values[i - 4]) / values[i - 4]) * 100;
                 growthCell.innerText = isNaN(yoyGrowthValue) ? "N/A" : yoyGrowthValue.toFixed(2) + '%';
                 yoyGrowthValues.push(yoyGrowthValue);
                 applyColoring(growthCell, yoyGrowthValue); // Apply color based on growth value
