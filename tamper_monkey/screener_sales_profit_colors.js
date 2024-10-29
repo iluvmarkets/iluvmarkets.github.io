@@ -200,7 +200,7 @@
     applyConditionalFormatting("#quarters", "Revenue", "QoQ% Growth", true, "YoY% Growth", true);
     applyConditionalFormatting("#quarters", "Sales", "QoQ% Growth", true, "YoY% Growth", true);
     applyConditionalFormatting("#quarters", "Net Profit", "QoQ% Growth", true, "YoY% Growth", true);
-    applyConditionalFormatting("#quarters", "EPS in Rs", "QoQ% Growth", true, "YoY% Growth", true);
+    //applyConditionalFormatting("#quarters", "EPS in Rs", "QoQ% Growth", true, "YoY% Growth", true);
 
     // Profit & Loss
     applyConditionalFormatting("#profit-loss", "Revenue", "YoY% Growth", true);
