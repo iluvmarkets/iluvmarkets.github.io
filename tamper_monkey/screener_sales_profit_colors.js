@@ -193,8 +193,8 @@
     }
 
     //Config
-    const colorScheme = ColorScheme.SIMPLE; // Valid values: ColorScheme.SIMPLE ColorScheme.GRADIENT
-    const decimals = 0; // Valid values: 0, 1, 2
+    const colorScheme = ColorScheme.GRADIENT; // Valid values: ColorScheme.SIMPLE ColorScheme.GRADIENT
+    const decimals = 2; // Valid values: 0, 1, 2
 
     // Quarterly Results
     applyConditionalFormatting("#quarters", "Revenue", "QoQ% Growth", true, "YoY% Growth", true);
