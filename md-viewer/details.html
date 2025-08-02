@@ -97,29 +97,26 @@
         rows.forEach(row => {
           const cells = row.querySelectorAll('td');
 
-          // Target column 6 (index 5)
-          if (cells[5]) {
-            const value6 = parseFloat(cells[5].textContent);
-            if (!isNaN(value6)) {
-              if (value6 < 0) {
-                cells[5].classList.add('negative');
-              } else if (value6 > 0) {
-                cells[5].classList.add('positive');
-              }
-            }
-          }
+          cells.forEach((cell, index) => {
+            // Attempt to parse the cell's content as a number.
+            const value = parseFloat(cell.textContent.replace(/,/g, ''));
+            
+            // Check if it's a valid number.
+            if (!isNaN(value)) {
+              // Format the number with commas using toLocaleString, specifying the Indian locale.
+              cell.textContent = value.toLocaleString('en-IN');
 
-          // Target column 7 (index 6)
-          if (cells[6]) {
-            const value7 = parseFloat(cells[6].textContent);
-            if (!isNaN(value7)) {
-              if (value7 < 0) {
-                cells[6].classList.add('negative');
-              } else if (value7 > 0) {
-                cells[6].classList.add('positive');
+              // Apply coloring for specific columns (6 and 7).
+              // Columns are 1-indexed for the user, but 0-indexed in the code.
+              if (index === 5 || index === 6) {
+                if (value < 0) {
+                  cell.classList.add('negative');
+                } else if (value > 0) {
+                  cell.classList.add('positive');
+                }
               }
             }
-          }
+          });
         });
       });
     }
