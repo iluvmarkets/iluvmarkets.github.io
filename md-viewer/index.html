@@ -79,52 +79,46 @@
   <div id="content">Loading...</div>
 
   <script>
- document.addEventListener('DOMContentLoaded', function() {
-    // Change querySelector to querySelectorAll to get all tables
-    const tables = document.querySelectorAll('table');
-    
-    // Check if any tables were found
-    if (tables.length === 0) {
-        return; // Exit if no tables are on the page
-    }
-
-    // Iterate over each table found
-    tables.forEach(table => {
-        // Get all rows in the tbody of the *current* table
-        const rows = table.querySelectorAll('tbody tr');
-
-        rows.forEach(row => {
-            // Get all cells (td) in the current row
-            const cells = row.querySelectorAll('td');
-
-            // Target column 6 (index 5)
-            if (cells[5]) { // Check if the cell exists
-                const value6 = parseFloat(cells[5].textContent);
-                if (!isNaN(value6)) { // Check if it's a valid number
-                    if (value6 < 0) {
-                        cells[5].classList.add('negative');
-                    } else if (value6 > 0) {
-                        cells[5].classList.add('positive');
-                    }
-                    // If value6 is 0, no class is added, so it retains default color
-                }
-            }
-
-            // Target column 7 (index 6)
-            if (cells[6]) { // Check if the cell exists
-                const value7 = parseFloat(cells[6].textContent);
-                if (!isNaN(value7)) { // Check if it's a valid number
-                    if (value7 < 0) {
-                        cells[6].classList.add('negative');
-                    } else if (value7 > 0) {
-                        cells[6].classList.add('positive');
-                    }
-                    // If value7 is 0, no class is added
-                }
-            }
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        applyTableStyling();
     });
-});
+
+    function applyTableStyling() {
+      // Find all tables on the page.
+      const tables = document.querySelectorAll('table');
+      
+      if (tables.length === 0) {
+        return; // Exit if no tables are found.
+      }
+
+      tables.forEach(table => {
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+          const cells = row.querySelectorAll('td');
+
+          cells.forEach((cell, index) => {
+            // Attempt to parse the cell's content as a number.
+            const value = parseFloat(cell.textContent.replace(/,/g, ''));
+            
+            // Check if it's a valid number.
+            if (!isNaN(value)) {
+              // Format the number with commas using toLocaleString, specifying the Indian locale.
+              cell.textContent = value.toLocaleString('en-IN');
+
+              // Apply coloring for specific columns (6 and 7).
+              // Columns are 1-indexed for the user, but 0-indexed in the code.
+              if (index === 5 || index === 6) {
+                if (value < 0) {
+                  cell.classList.add('negative');
+                } else if (value > 0) {
+                  cell.classList.add('positive');
+                }
+              }
+            }
+          });
+        });
+      });
+    }    
 
     function getParam(name) {
       const urlParams = new URLSearchParams(window.location.search);
