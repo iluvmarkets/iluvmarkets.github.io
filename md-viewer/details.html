@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Analysis Markdown Viewer</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+  body {
+    font-family: sans-serif;
+    font-size: 14px; /* Slightly smaller font */
+    padding: 2rem;
+    max-width: 800px;
+    margin: auto;
+    background-color: #f9f9f9;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f9f9f9;
+  }
+
+  h1, h2, h3 {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+    margin-top: 2rem;
+  }
+
+  pre, code {
+    background-color: #f0f0f0;
+    padding: 6px;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+
+  table td:first-child,
+  table th:first-child {
+    width: 30%;
+    text-align: left;
+  }
+
+  table td:not(:first-child),
+  table th:not(:first-child) {
+    width: 10%;
+    text-align: right;
+  }
+
+/* These classes will be added by JavaScript */
+.negative {
+    color: red;
+}
+
+.positive {
+    color: green;
+}
+  </style>
+</head>
+<body>
+<div id="content">Loading...</div>
+
+<script>
+    // The Apps Script web app URL.
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzy9OkOVsflibkZo5ryhrFoNoSSHhjVYiZzcWX0WuLoJNV9RZXayTCiDwK2BbYZQrNyIQ/exec";
+
+    /**
+     * Applies styling to table cells based on their numeric value.
+     * This function is called after the markdown is rendered.
+     */
+    function applyTableStyling() {
+      // Find all tables on the page.
+      const tables = document.querySelectorAll('table');
+      
+      if (tables.length === 0) {
+        return; // Exit if no tables are found.
+      }
+
+      tables.forEach(table => {
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+          const cells = row.querySelectorAll('td');
+
+          // Target column 6 (index 5)
+          if (cells[5]) {
+            const value6 = parseFloat(cells[5].textContent);
+            if (!isNaN(value6)) {
+              if (value6 < 0) {
+                cells[5].classList.add('negative');
+              } else if (value6 > 0) {
+                cells[5].classList.add('positive');
+              }
+            }
+          }
+
+          // Target column 7 (index 6)
+          if (cells[6]) {
+            const value7 = parseFloat(cells[6].textContent);
+            if (!isNaN(value7)) {
+              if (value7 < 0) {
+                cells[6].classList.add('negative');
+              } else if (value7 > 0) {
+                cells[6].classList.add('positive');
+              }
+            }
+          }
+        });
+      });
+    }
+
+    /**
+     * Gets a query parameter from the URL.
+     * @param {string} name The name of the parameter.
+     * @returns {string|null} The value of the parameter or null.
+     */
+    function getParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+
+    // Get the company symbol from the URL query parameter.
+    const companySymbol = getParam('company');
+    const contentDiv = document.getElementById("content");
+
+    // Main execution logic for fetching and rendering content.
+    if (companySymbol) {
+      contentDiv.innerHTML = "<h1>Loading AI Analysis for " + companySymbol.toUpperCase() + "...</h1>";
+      
+      const url = `${WEB_APP_URL}?company=${companySymbol}`;
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success' && data.ai_analysis) {
+            const fullContent = data.ai_analysis;
+
+            // Immediately display a truncated version for quick feedback.
+            // This is the "get the first 2000 chars and displays immediately" part.
+            const partialContent = fullContent.substring(0, 2000);
+            contentDiv.innerHTML = marked.parse(partialContent + "...");
+
+            // In the background, fetch the full content and update.
+            // Since we already have the full content from the first fetch,
+            // we can just update the content after a short delay.
+            // This simulates an asynchronous update.
+            setTimeout(() => {
+              contentDiv.innerHTML = marked.parse(fullContent);
+              // Apply styling after the full content is rendered.
+              applyTableStyling();
+            }, 100); // A small delay to demonstrate the update.
+
+          } else {
+            contentDiv.innerHTML = `<p style='color:red'>${data.message || 'Error: Could not retrieve analysis.'}</p>`;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching data:', error);
+          contentDiv.innerHTML = `<p style='color:red'>An error occurred while fetching the data: ${error.message}</p>`;
+        });
+    } else {
+      contentDiv.innerHTML = "<p style='color:red'>No company symbol provided. Please use a URL parameter like <code>?company=GOOG</code>.</p>";
+    }
+  </script>
+</body>
+</html>
