@@ -1,0 +1,26 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Markdown Viewer</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 800px; margin: auto; }
+    pre, code { background-color: #f0f0f0; padding: 4px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="content">Loading...</div>
+  <script>
+    function getParam(name) {
+      const url = new URL(window.location);
+      return decodeURIComponent(url.searchParams.get(name) || '');
+    }
+
+    const md = getParam('md');
+    const html = marked.parse(md);
+    document.getElementById('content').innerHTML = html;
+  </script>
+</body>
+</html>
