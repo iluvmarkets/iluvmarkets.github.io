@@ -120,12 +120,21 @@
       });
     }    
 
+    function getParam2(name) {
+    name = name.replace(/[\[\]]/g, '\\$&');
+    const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+    const results = regex.exec(window.location.href);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
     function getParam(name) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(name);
     }
 
-    const rawMd = getParam('md');
+    const rawMd = getParam2('md');
     if (rawMd) {
     //   const decoded = decodeURIComponent(rawMd);
       const html = marked.parse(rawMd);
