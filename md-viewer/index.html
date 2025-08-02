@@ -62,32 +62,16 @@
     text-align: right;
   }
 
-/* td:nth-child(6),
-td:nth-child(7) {
-  color: green; /* default — positive style */
-} */
-
-/* Targeting the 6th column (td:nth-child(6)) */
-/* Positive numbers (don't start with '-') */
-td:nth-child(6):not([data-value^="-"]) {
-    color: green;
-}
-
-/* Negative numbers (start with '-') */
-td:nth-child(6)[data-value^="-"] {
+/* These classes will be added by JavaScript */
+.negative {
     color: red;
 }
 
-/* Targeting the 7th column (td:nth-child(7)) */
-/* Positive numbers (don't start with '-') */
-td:nth-child(7):not([data-value^="-"]) {
+.positive {
     color: green;
 }
 
-/* Negative numbers (start with '-') */
-td:nth-child(7)[data-value^="-"] {
-    color: red;
-}
+
 </style>
  
 </head>
@@ -95,6 +79,45 @@ td:nth-child(7)[data-value^="-"] {
   <div id="content">Loading...</div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const table = document.querySelector('table');
+        if (!table) return;
+
+        // Get all rows in the tbody
+        const rows = table.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            // Get all cells (td) in the current row
+            const cells = row.querySelectorAll('td');
+
+            // Target column 6 (index 5)
+            if (cells[5]) { // Check if the cell exists
+                const value6 = parseFloat(cells[5].textContent);
+                if (!isNaN(value6)) { // Check if it's a valid number
+                    if (value6 < 0) {
+                        cells[5].classList.add('negative');
+                    } else if (value6 > 0) {
+                        cells[5].classList.add('positive');
+                    }
+                    // If value6 is 0, no class is added, so it retains default color
+                }
+            }
+
+            // Target column 7 (index 6)
+            if (cells[6]) { // Check if the cell exists
+                const value7 = parseFloat(cells[6].textContent);
+                if (!isNaN(value7)) { // Check if it's a valid number
+                    if (value7 < 0) {
+                        cells[6].classList.add('negative');
+                    } else if (value7 > 0) {
+                        cells[6].classList.add('positive');
+                    }
+                    // If value7 is 0, no class is added
+                }
+            }
+        });
+    });
+
     function getParam(name) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(name);
