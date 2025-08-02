@@ -62,13 +62,32 @@
     text-align: right;
   }
 
-  .positive {
-    color: green;
-  }
+/* td:nth-child(6),
+td:nth-child(7) {
+  color: green; /* default — positive style */
+} */
 
-  .negative {
+/* Targeting the 6th column (td:nth-child(6)) */
+/* Positive numbers (don't start with '-') */
+td:nth-child(6):not([data-value^="-"]) {
+    color: green;
+}
+
+/* Negative numbers (start with '-') */
+td:nth-child(6)[data-value^="-"] {
     color: red;
-  }
+}
+
+/* Targeting the 7th column (td:nth-child(7)) */
+/* Positive numbers (don't start with '-') */
+td:nth-child(7):not([data-value^="-"]) {
+    color: green;
+}
+
+/* Negative numbers (start with '-') */
+td:nth-child(7)[data-value^="-"] {
+    color: red;
+}
 </style>
  
 </head>
