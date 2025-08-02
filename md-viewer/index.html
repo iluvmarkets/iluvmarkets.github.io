@@ -79,11 +79,18 @@
   <div id="content">Loading...</div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const table = document.querySelector('table');
-        if (!table) return;
+ document.addEventListener('DOMContentLoaded', function() {
+    // Change querySelector to querySelectorAll to get all tables
+    const tables = document.querySelectorAll('table');
+    
+    // Check if any tables were found
+    if (tables.length === 0) {
+        return; // Exit if no tables are on the page
+    }
 
-        // Get all rows in the tbody
+    // Iterate over each table found
+    tables.forEach(table => {
+        // Get all rows in the tbody of the *current* table
         const rows = table.querySelectorAll('tbody tr');
 
         rows.forEach(row => {
@@ -117,6 +124,7 @@
             }
         });
     });
+});
 
     function getParam(name) {
       const urlParams = new URLSearchParams(window.location.search);
