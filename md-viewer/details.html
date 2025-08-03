@@ -84,13 +84,18 @@
 .positive {
     color: green;
 }
+
+.hidden {
+    display: none;
+}
+
   </style>
 </head>
 <body>
 
 <div id="companyBanner" class="company-banner"></div>
 
-<div class="tradingview-widget-container" style="margin-bottom: 2rem;">
+<div class="tradingview-widget-container hidden" style="margin-bottom: 2rem;">
   <div id="tradingview-mini-chart" class="tradingview-widget-container__widget"></div>
   <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
   {
@@ -164,6 +169,60 @@
       return urlParams.get(name);
     }
 
+    /**
+     * Updates the visibility of the TV chart and syncs the checkbox.
+     * @param {boolean} showChart - true to show, false to hide.
+     */
+    function updateChartVisibility(showChart) {
+        if (showChart) {
+            tradingviewWidgetContainer.classList.remove('hidden');
+        } else {
+            tradingviewWidgetContainer.classList.add('hidden');
+        }
+    }       
+
+    /**
+     * Initializes the TV chart preference based on URL parameters or localStorage.
+     * Sets default if no preference found.
+     * @returns {void}
+     */
+    function initializeTvChartPreference() {
+        // 1. Check for URL query parameter first
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPreference = urlParams.get('tvchart');
+
+        if (urlPreference) {
+            let showChartFromUrl;
+            if (urlPreference.toLowerCase() === 'show') {
+                showChartFromUrl = true;
+            } else if (urlPreference.toLowerCase() === 'hide') {
+                showChartFromUrl = false;
+            }
+
+            // If a valid preference was found in the URL, save it and apply it.
+            if (showChartFromUrl !== undefined) {
+                localStorage.setItem(PREFERENCE_KEY, showChartFromUrl.toString());
+                updateChartVisibility(showChartFromUrl);
+                // Optionally, clear the URL parameter to prevent persistent overrides on refresh
+                // window.history.replaceState({}, document.title, window.location.pathname);
+                return showChartFromUrl; // Exit as URL param takes precedence
+            }
+        }
+
+        // 2. If no valid URL parameter, load from localStorage
+        const savedPreference = localStorage.getItem(PREFERENCE_KEY);
+        if (savedPreference !== null) {
+            const showChart = (savedPreference === 'true');
+            updateChartVisibility(showChart);
+            return showChart;
+        } else {
+            // 3. If no localStorage preference, apply default and save it
+            localStorage.setItem(PREFERENCE_KEY, DEFAULT_SHOW_CHART.toString());
+            updateChartVisibility(DEFAULT_SHOW_CHART);
+            return DEFAULT_SHOW_CHART;
+        }
+    }    
+
     // Get the company symbol from the URL query parameter.
     const companySymbol = getParam('company');
     const contentDiv = document.getElementById("content");
@@ -171,6 +230,9 @@
     const tradingviewWidgetContainer = document.querySelector(".tradingview-widget-container");
     const tradingviewScript = tradingviewWidgetContainer.querySelector('script');
 
+    // Constants
+    const PREFERENCE_KEY = 'showTvChart';
+    const DEFAULT_SHOW_CHART = true;    
 
     // Main execution logic for fetching and rendering content.
     if (companySymbol) {
@@ -181,27 +243,30 @@
 
       // Update the TradingView widget symbol
       const tradingViewSymbol = `BSE:${companySymbol.toUpperCase()}`;
-      
-      // We need to re-initialize the TradingView widget script to change the symbol dynamically.
-      // A common way to do this is to remove the old script and add a new one.
-      tradingviewScript.remove();
-      const newTradingviewScript = document.createElement('script');
-      newTradingviewScript.type = 'text/javascript';
-      newTradingviewScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
-      newTradingviewScript.async = true;
-      newTradingviewScript.innerHTML = JSON.stringify({
-          "symbol": tradingViewSymbol,
-          "width": "100%",
-          "height": "300",
-          "locale": "en",
-          "dateRange": "3Y",
-          "colorTheme": "light",
-          "isTransparent": false,
-          "autosize": false,
-          "largeChartUrl": ""
-      });
-      tradingviewWidgetContainer.appendChild(newTradingviewScript);
 
+      const showTvchart = initializeTvChartPreference();
+
+      if (showTvchart) {
+        // We need to re-initialize the TradingView widget script to change the symbol dynamically.
+        // A common way to do this is to remove the old script and add a new one.
+        tradingviewScript.remove();
+        const newTradingviewScript = document.createElement('script');
+        newTradingviewScript.type = 'text/javascript';
+        newTradingviewScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+        newTradingviewScript.async = true;
+        newTradingviewScript.innerHTML = JSON.stringify({
+            "symbol": tradingViewSymbol,
+            "width": "100%",
+            "height": "300",
+            "locale": "en",
+            "dateRange": "3Y",
+            "colorTheme": "light",
+            "isTransparent": false,
+            "autosize": false,
+            "largeChartUrl": ""
+        });
+        tradingviewWidgetContainer.appendChild(newTradingviewScript);
+    }
 
       contentDiv.innerHTML = "<h1>Loading AI Analysis for " + companySymbol.toUpperCase() + "...</h1>";
       
