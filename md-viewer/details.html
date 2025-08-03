@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Analysis Markdown Viewer</title>
+<title>AI Analysis</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
   body {
@@ -174,6 +174,8 @@
 
     // Main execution logic for fetching and rendering content.
     if (companySymbol) {
+      //Update Window Title
+      document.title = `${companySymbol.toUpperCase()} - AI Analysis`;
       // Update the company banner
       companyBanner.textContent = companySymbol.toUpperCase();
 
