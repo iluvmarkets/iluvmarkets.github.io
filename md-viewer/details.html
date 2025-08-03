@@ -223,6 +223,13 @@
         }
     }    
 
+    function sanitizeTradingViewSymbol(symbol) {
+        // Replace '&' with '_'
+        // Replace '-' with '_'
+        // Use /g flag for global replacement (all occurrences)
+        return symbol.replace(/&/g, '_').replace(/-/g, '_');
+    }    
+
     // Get the company symbol from the URL query parameter.
     const companySymbol = getParam('company');
     const contentDiv = document.getElementById("content");
@@ -242,7 +249,7 @@
       companyBanner.textContent = companySymbol.toUpperCase();
 
       // Update the TradingView widget symbol
-      const tradingViewSymbol = `BSE:${companySymbol.toUpperCase()}`;
+      const tradingViewSymbol = `BSE:${sanitizeTradingViewSymbol(companySymbol.toUpperCase())}`;
 
       const showTvchart = initializeTvChartPreference();
 
@@ -270,7 +277,7 @@
 
       contentDiv.innerHTML = "<h1>Loading AI Analysis for " + companySymbol.toUpperCase() + "...</h1>";
       
-      const url = `${WEB_APP_URL}?company=${companySymbol}`;
+      const url = `${WEB_APP_URL}?company=${encodeURIComponent(companySymbol)}`;
 
       fetch(url)
         .then(response => response.json())
