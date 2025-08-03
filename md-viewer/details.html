@@ -15,6 +15,19 @@
     background-color: #f9f9f9;
   }
 
+  /* Banner styles */
+  .company-banner {
+    background-color: #007bff; /* Blue background */
+    color: white;
+    padding: 1rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    font-size: 1.8em;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
@@ -74,6 +87,26 @@
   </style>
 </head>
 <body>
+
+<div id="companyBanner" class="company-banner"></div>
+
+<div class="tradingview-widget-container" style="margin-bottom: 2rem;">
+  <div id="tradingview-mini-chart" class="tradingview-widget-container__widget"></div>
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+  {
+  "symbol": "BSE:SENSEX", /* Default symbol, will be updated by JS */
+  "width": "100%",
+  "height": "300",
+  "locale": "en",
+  "dateRange": "3Y", /* 3 years chart */
+  "colorTheme": "light",
+  "isTransparent": false,
+  "autosize": false,
+  "largeChartUrl": ""
+}
+  </script>
+</div>
+
 <div id="content">Loading...</div>
 
 <script>
@@ -134,9 +167,40 @@
     // Get the company symbol from the URL query parameter.
     const companySymbol = getParam('company');
     const contentDiv = document.getElementById("content");
+    const companyBanner = document.getElementById("companyBanner");
+    const tradingviewWidgetContainer = document.querySelector(".tradingview-widget-container");
+    const tradingviewScript = tradingviewWidgetContainer.querySelector('script');
+
 
     // Main execution logic for fetching and rendering content.
     if (companySymbol) {
+      // Update the company banner
+      companyBanner.textContent = companySymbol.toUpperCase();
+
+      // Update the TradingView widget symbol
+      const tradingViewSymbol = `BSE:${companySymbol.toUpperCase()}`;
+      
+      // We need to re-initialize the TradingView widget script to change the symbol dynamically.
+      // A common way to do this is to remove the old script and add a new one.
+      tradingviewScript.remove();
+      const newTradingviewScript = document.createElement('script');
+      newTradingviewScript.type = 'text/javascript';
+      newTradingviewScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js';
+      newTradingviewScript.async = true;
+      newTradingviewScript.innerHTML = JSON.stringify({
+          "symbol": tradingViewSymbol,
+          "width": "100%",
+          "height": "300",
+          "locale": "en",
+          "dateRange": "3Y",
+          "colorTheme": "light",
+          "isTransparent": false,
+          "autosize": false,
+          "largeChartUrl": ""
+      });
+      tradingviewWidgetContainer.appendChild(newTradingviewScript);
+
+
       contentDiv.innerHTML = "<h1>Loading AI Analysis for " + companySymbol.toUpperCase() + "...</h1>";
       
       const url = `${WEB_APP_URL}?company=${companySymbol}`;
@@ -148,19 +212,15 @@
             const fullContent = data.ai_analysis;
 
             // Immediately display a truncated version for quick feedback.
-            // This is the "get the first 2000 chars and displays immediately" part.
             const partialContent = fullContent.substring(0, 2000);
-            contentDiv.innerHTML = marked.parse(partialContent + "...");
+            contentDiv.innerHTML = marked.parse(partialContent + (fullContent.length > 2000 ? "..." : ""));
 
             // In the background, fetch the full content and update.
-            // Since we already have the full content from the first fetch,
-            // we can just update the content after a short delay.
-            // This simulates an asynchronous update.
             setTimeout(() => {
               contentDiv.innerHTML = marked.parse(fullContent);
               // Apply styling after the full content is rendered.
               applyTableStyling();
-            }, 100); // A small delay to demonstrate the update.
+            }, 100); 
 
           } else {
             contentDiv.innerHTML = `<p style='color:red'>${data.message || 'Error: Could not retrieve analysis.'}</p>`;
@@ -171,6 +231,7 @@
           contentDiv.innerHTML = `<p style='color:red'>An error occurred while fetching the data: ${error.message}</p>`;
         });
     } else {
+      companyBanner.textContent = "AI Analysis Viewer";
       contentDiv.innerHTML = "<p style='color:red'>No company symbol provided. Please use a URL parameter like <code>?company=GOOG</code>.</p>";
     }
   </script>
